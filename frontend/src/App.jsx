@@ -1,15 +1,28 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/login";
-import Signup from "./pages/signup";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
+
+  // check login
+  const isLoggedIn = localStorage.getItem("token");
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
+
+        {/* Default route */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Login */}
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected dashboard */}
+        <Route
+          path="/dashboard"
+          element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
+        />
+
       </Routes>
     </BrowserRouter>
   );
