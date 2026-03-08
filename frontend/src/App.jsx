@@ -7,7 +7,8 @@ import ItemDetail from "./pages/ItemDetail";
 import AddItem from "./pages/AddItem";
 import MyItems from "./pages/MyItems";
 import MyBookings from "./pages/MyBookings";
-import IncomingRequests from "./pages/IncomingRequests";
+import Requests from "./pages/Requests";
+import ScanQR from "./pages/ScanQR";
 
 function ProtectedRoute({ children }) {
   const isLoggedIn = localStorage.getItem("token");
@@ -22,12 +23,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
-
+        <Route path="/scan" element={<ScanQR />} />
         <Route path="/item/:id" element={<ProtectedRoute><ItemDetail /></ProtectedRoute>} />
         <Route path="/add-item" element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
         <Route path="/my-items" element={<ProtectedRoute><MyItems /></ProtectedRoute>} />
         <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
-        <Route path="/incoming-requests" element={<ProtectedRoute><IncomingRequests /></ProtectedRoute>} />
+        <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

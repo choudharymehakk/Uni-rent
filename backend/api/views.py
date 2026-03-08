@@ -114,50 +114,6 @@ def create_item(request):
     return Response(serializer.errors, status=400)
 
 
-# ---------------- UPDATE ITEM ----------------
-
-@api_view(["PUT", "PATCH"])
-@permission_classes([IsAuthenticated])
-def update_item(request, pk):
-
-    try:
-        item = Item.objects.get(pk=pk)
-
-        if item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
-
-        serializer = ItemSerializer(item, data=request.data, partial=True)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-
-        return Response(serializer.errors, status=400)
-
-    except Item.DoesNotExist:
-        return Response({"error": "Item not found"}, status=404)
-
-
-# ---------------- DELETE ITEM ----------------
-
-@api_view(["DELETE"])
-@permission_classes([IsAuthenticated])
-def delete_item(request, pk):
-
-    try:
-        item = Item.objects.get(pk=pk)
-
-        if item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
-
-        item.delete()
-
-        return Response({"message": "Item deleted"}, status=200)
-
-    except Item.DoesNotExist:
-        return Response({"error": "Item not found"}, status=404)
-
-
 # ---------------- MY ITEMS ----------------
 
 @api_view(["GET"])
@@ -244,6 +200,7 @@ def respond_booking(request, booking_id):
 
             booking.status = "approved"
 
+            # Generate QR
             qr_data = f"BOOKING_{booking.id}"
             qr = qrcode.make(qr_data)
 
@@ -253,10 +210,14 @@ def respond_booking(request, booking_id):
             qr_path = os.path.join(qr_folder, f"booking_{booking.id}.png")
             qr.save(qr_path)
 
-            booking.pickup_qr = f"qr_codes/booking_{booking.id}.png"
+            booking.pickup_qr = f"/media/qr_codes/booking_{booking.id}.png"
+
             booking.save()
 
-            return Response({"message": "Booking approved and QR generated"})
+            return Response({
+                "message": "Booking approved and QR generated",
+                "pickup_qr": booking.pickup_qr
+            })
 
         elif action == "reject":
 
@@ -305,6 +266,7 @@ def upload_return_image(request, booking_id):
     try:
 
         booking = BookingRequest.objects.get(id=booking_id)
+
         image = request.FILES.get("return_image")
 
         if not image:
@@ -342,6 +304,50 @@ def complete_booking(request, booking_id):
 
     except BookingRequest.DoesNotExist:
         return Response({"error": "Booking not found"}, status=404)
+# ---------------- UPDATE ITEM ----------------
+
+@api_view(["PUT", "PATCH"])
+@permission_classes([IsAuthenticated])
+def update_item(request, pk):
+
+    try:
+        item = Item.objects.get(pk=pk)
+
+        if item.owner != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+
+        serializer = ItemSerializer(item, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=400)
+
+    except Item.DoesNotExist:
+        return Response({"error": "Item not found"}, status=404)
+
+
+# ---------------- DELETE ITEM ----------------
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_item(request, pk):
+
+    try:
+        item = Item.objects.get(pk=pk)
+
+        if item.owner != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+
+        item.delete()
+
+        return Response({"message": "Item deleted"}, status=200)
+
+    except Item.DoesNotExist:
+        return Response({"error": "Item not found"}, status=404)
+
+
 # ---------------- MARK ITEM AVAILABLE AGAIN ----------------
 
 @api_view(["POST"])
