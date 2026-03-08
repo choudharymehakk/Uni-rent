@@ -77,6 +77,8 @@ function Dashboard() {
                   <p className="owner">
                     by {item.owner.username} · {item.owner.branch} Y{item.owner.year}
                   </p>
+                  <p>Rent: ₹{item.price_per_day}/day</p>
+                  <p>Deposit: ₹{item.deposit_amount}</p>
 
                 </div>
 
