@@ -52,13 +52,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'mehakkchoudhary',
-        'HOST': 'db.fqdcjrwkdxmdqkuyaynq.supabase.co',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres.fqdcjrwkdxmdqkuyaynq",
+        "PASSWORD": "mehakkchoudhary",
+        "HOST": "aws-1-ap-south-1.pooler.supabase.com",
+        "PORT": "5432",
+        "OPTIONS": {
+            "sslmode": "require",
+        },
     }
 }
 

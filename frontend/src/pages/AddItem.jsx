@@ -13,10 +13,37 @@ function AddItem() {
   const [price, setPrice] = useState("");
   const [deposit, setDeposit] = useState("");
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // ---------------- AUTO DEPOSIT LOGIC ----------------
+
+  const handlePriceChange = (e) => {
+
+    const value = e.target.value;
+
+    setPrice(value);
+
+    if (value) {
+
+      const suggestedDeposit = value * 3;
+
+      setDeposit(suggestedDeposit);
+
+    } else {
+
+      setDeposit("");
+
+    }
+
+  };
+
+  // ---------------- SUBMIT ITEM ----------------
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
+
+    setLoading(true);
 
     const formData = new FormData();
 
@@ -26,43 +53,64 @@ function AddItem() {
     formData.append("deposit_amount", deposit);
     formData.append("image", image);
 
-    const res = await fetch(
-      "http://127.0.0.1:8000/api/items/create/",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData
+    try {
+
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/items/create/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (res.ok) {
+
+        alert("Item listed successfully");
+
+        navigate("/my-items");
+
+      } else {
+
+        const data = await res.json();
+
+        console.log(data);
+
+        alert("Failed to list item");
+
       }
-    );
 
-    if (res.ok) {
+    } catch (error) {
 
-      alert("Item listed successfully");
+      console.error(error);
 
-      navigate("/my-items");
-
-    } else {
-
-      alert("Error listing item");
+      alert("Server error");
 
     }
+
+    setLoading(false);
+
   };
 
   return (
     <>
-      <Navbar />
+
+
 
       <div className="page">
 
         <div className="page-header">
           <h1>List Your Item</h1>
+          <p>Add details so others can rent your item.</p>
         </div>
+
 
         <form className="form" onSubmit={handleSubmit}>
 
           <label>Item Title</label>
+
           <input
             type="text"
             placeholder="Example: DSLR Camera"
@@ -71,49 +119,58 @@ function AddItem() {
             required
           />
 
+
           <label>Description</label>
+
           <textarea
-            placeholder="Describe your item"
+            placeholder="Describe the item condition and usage"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
           />
 
+
           <label>Rent Per Day (₹)</label>
+
           <input
             type="number"
             placeholder="Example: 200"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={handlePriceChange}
             required
           />
 
-          {/* DEPOSIT FIELD ADDED HERE */}
 
-          <label>Deposit Amount (Refundable) ₹</label>
+          <label>Deposit Amount (Refundable)</label>
+
           <input
             type="number"
-            placeholder="Example: 1000"
+            placeholder="Auto suggested (3 × rent)"
             value={deposit}
             onChange={(e) => setDeposit(e.target.value)}
-            required
           />
 
-          <label>Upload Image</label>
+
+          <label>Upload Item Image</label>
+
           <input
             type="file"
             onChange={(e) => setImage(e.target.files[0])}
             required
           />
 
-          <button className="btn primary">
-            List Item
+
+          <button className="btn primary" disabled={loading}>
+
+            {loading ? "Listing..." : "List Item"}
+
           </button>
 
         </form>
 
       </div>
     </>
+
   );
 }
 
