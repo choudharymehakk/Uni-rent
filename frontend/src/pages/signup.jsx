@@ -36,6 +36,7 @@ function Signup() {
     if (res.ok) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
+      localStorage.setItem("user_id", data.user_id);
       navigate("/dashboard");
     } else {
       const firstError = Object.values(data)[0];
