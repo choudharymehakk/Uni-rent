@@ -35,12 +35,15 @@ function Navbar() {
         {token && (
           <>
             <Link to="/dashboard">Browse</Link>
+            <Link to="/profile">Profile</Link>
 
             <Link to="/my-items">My Items</Link>
 
             <Link to="/requests">Requests</Link>
 
             <Link to="/my-bookings">My Bookings</Link>
+
+            <Link to="/profile">Profile</Link>
 
             <Link to="/scan">Scan QR</Link>
 

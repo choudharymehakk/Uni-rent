@@ -10,6 +10,7 @@ import MyItems from "./pages/MyItems";
 import MyBookings from "./pages/MyBookings";
 import Requests from "./pages/Requests";
 import ScanQR from "./pages/ScanQR";
+import Profile from "./pages/Profile";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -86,6 +87,7 @@ function App() {
           }
         />
 
+        <Route path="/profile" element={<Profile />} />
         <Route
           path="/requests"
           element={
