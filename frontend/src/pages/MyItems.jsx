@@ -4,37 +4,32 @@ import Navbar from "../components/Navbar";
 function MyItems() {
 
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const token = localStorage.getItem("token");
 
   const fetchItems = async () => {
+    try {
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/items/mine/",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
-    const res = await fetch(
-      "http://127.0.0.1:8000/api/items/mine/",
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
+      const data = await res.json();
+      setItems(data);
+      setLoading(false);
 
-    const data = await res.json();
-    setItems(data);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchItems();
   }, []);
-
-  const markAvailable = async (id) => {
-
-    await fetch(
-      `http://127.0.0.1:8000/api/items/${id}/mark-available/`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-
-    fetchItems();
-  };
 
   return (
     <>
@@ -44,7 +39,9 @@ function MyItems() {
 
         <h1>My Items</h1>
 
-        {items.length === 0 ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : items.length === 0 ? (
           <p>No items listed yet</p>
         ) : (
 
@@ -73,13 +70,11 @@ function MyItems() {
                       : "Currently rented"}
                   </p>
 
+                  {/* ❌ REMOVED mark available button */}
                   {!item.is_available && (
-                    <button
-                      className="btn primary"
-                      onClick={() => markAvailable(item.id)}
-                    >
-                      Mark Available
-                    </button>
+                    <p style={{ color: "#b6ff3b", marginTop: "8px" }}>
+                      Waiting for return confirmation
+                    </p>
                   )}
 
                 </div>

@@ -5,7 +5,11 @@ function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [messages, setMessages] = useState({});
+  const [inputs, setInputs] = useState({});
+
   const token = localStorage.getItem("token");
+  const userId = parseInt(localStorage.getItem("user_id"));
 
   const fetchBookings = () => {
     fetch("http://127.0.0.1:8000/api/bookings/mine/", {
@@ -23,127 +27,164 @@ function MyBookings() {
     fetchBookings();
   }, []);
 
-  const pickupItem = async (bookingId) => {
+  // ---------------- CHAT ----------------
+  const fetchMessages = async (bookingId) => {
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/bookings/${bookingId}/messages/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await res.json();
+      setMessages(prev => ({ ...prev, [bookingId]: data }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const sendMessage = async (bookingId) => {
+    const text = inputs[bookingId]?.trim();
+    if (!text) return;
+
     await fetch(
-      `http://127.0.0.1:8000/api/bookings/${bookingId}/pickup/`,
+      `http://127.0.0.1:8000/api/bookings/${bookingId}/send-message/`,
       {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ text }),
       }
     );
 
-    fetchBookings();
+    setInputs(prev => ({ ...prev, [bookingId]: "" }));
+    fetchMessages(bookingId);
   };
 
-  const completeBooking = async (bookingId) => {
-    await fetch(
-      `http://127.0.0.1:8000/api/bookings/${bookingId}/complete/`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  // ✅ AUTO LOAD CHAT
+  useEffect(() => {
+    if (bookings.length > 0) {
+      bookings.forEach(b => fetchMessages(b.id));
+    }
+  }, [bookings]);
 
-    fetchBookings();
-  };
+  // ✅ AUTO REFRESH CHAT
+  useEffect(() => {
+    const interval = setInterval(() => {
+      bookings.forEach(b => fetchMessages(b.id));
+    }, 3000);
 
-  const today = new Date().toISOString().split("T")[0];
+    return () => clearInterval(interval);
+  }, [bookings]);
 
   return (
     <>
       <Navbar />
 
       <div className="page">
-
         <div className="page-header">
-          <h1>My Booking Requests</h1>
+          <h1>My Bookings</h1>
         </div>
 
         {loading ? (
-          <p style={{ color: "var(--muted)" }}>Loading...</p>
+          <p>Loading...</p>
         ) : bookings.length === 0 ? (
-          <div className="empty-state">
-            <h3>No booking requests yet</h3>
-            <p>Browse items and send a request!</p>
-          </div>
+          <p>No bookings</p>
         ) : (
-
           bookings.map(b => (
-
             <div key={b.id} className="booking-card">
 
               <h3>{b.item.title}</h3>
 
-              <p className="meta">
-                📅 {b.start_date} → {b.end_date}
-                &nbsp; · &nbsp;
-                Owner: {b.item.owner.username} ({b.item.owner.phone})
-              </p>
+              <p>Owner: {b.item.owner.username}</p>
+              <p>Status: {b.status}</p>
 
-              <p className="meta">
-                ₹{b.item.price_per_day}/day
-              </p>
+              {/* ✅ MARK RETURN */}
+              {b.status === "rented" && (
+                <button
+                  className="btn primary"
+                  onClick={async () => {
+                    await fetch(
+                      `http://127.0.0.1:8000/api/bookings/${b.id}/mark-returned/`,
+                      {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
 
-              <span className={`status-badge ${b.status}`}>
-                {b.status}
-              </span>
-
-              {/* SHOW PICKUP QR */}
-
-              {b.status === "approved" && b.pickup_qr && (
-                <div style={{ marginTop: "15px" }}>
-
-                  <p><b>Pickup QR Code</b></p>
-
-                  <img
-                    src={`http://127.0.0.1:8000${b.pickup_qr}`}
-                    alt="pickup qr"
-                    style={{ width: "160px" }}
-                  />
-
-                  <p className="meta">
-                    Scan this QR during pickup
-                  </p>
-
-                  <button
-                    className="btn primary"
-                    onClick={() => pickupItem(b.id)}
-                  >
-                    Scan Pickup QR
-                  </button>
-
-                </div>
+                    fetchBookings();
+                  }}
+                >
+                  Mark as Returned
+                </button>
               )}
 
-              {/* SHOW RETURN OPTION ONLY ON END DATE */}
+              {/* ---------------- CHAT ---------------- */}
+              <div style={{ marginTop: "15px" }}>
+                <h4>Chat</h4>
 
-              {b.status === "rented" && today === b.end_date && (
-
-                <div style={{ marginTop: "15px" }}>
-
-                  <p><b>Return Item</b></p>
-
-                  <button
-                    className="btn primary"
-                    onClick={() => completeBooking(b.id)}
-                  >
-                    Scan Return QR
-                  </button>
-
+                <div
+                  style={{
+                    background: "#111",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    marginTop: "10px",
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                  }}
+                >
+                  {(messages[b.id] || []).map((msg) => (
+                    <div
+                      key={msg.id}
+                      style={{
+                        textAlign: msg.sender_id === userId ? "right" : "left",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: msg.sender_id === userId ? "#b6ff3b" : "#333",
+                          padding: "5px 10px",
+                          borderRadius: "10px",
+                          color: msg.sender_id === userId ? "black" : "white",
+                        }}
+                      >
+                        {msg.text}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
-              )}
+                <input
+                  type="text"
+                  value={inputs[b.id] || ""}
+                  onChange={(e) =>
+                    setInputs(prev => ({
+                      ...prev,
+                      [b.id]: e.target.value
+                    }))
+                  }
+                  placeholder="Type message..."
+                  className="chat-input"
+                />
+
+                <button
+                  className="btn secondary"
+                  style={{ marginTop: "5px" }}
+                  onClick={() => sendMessage(b.id)}
+                >
+                  Send
+                </button>
+              </div>
 
             </div>
-
           ))
-
         )}
-
       </div>
     </>
   );
