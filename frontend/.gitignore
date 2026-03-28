@@ -7,12 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# Node
+node_modules/
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Editor
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,16 +24,14 @@ dist-ssr
 *.sln
 *.sw?
 
-#Python
-
+# Python
 __pycache__/
 *.pyc
 db.sqlite3
 venv/
 
-#Node
+# Django media (VERY IMPORTANT)
+media/
 
-node_modules/
-
-#Environment
+# Environment
 .env
