@@ -162,3 +162,23 @@ class BookingRequest(models.Model):
 
     def __str__(self):
         return f"{self.requester.username} -> {self.item.title}"
+
+class Message(models.Model):
+
+    booking = models.ForeignKey(
+        BookingRequest,
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    text = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.text[:20]}"

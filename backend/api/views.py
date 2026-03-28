@@ -3,22 +3,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import status
 
-import qrcode
-import os
-from django.conf import settings
-
-from .models import Item, User, BookingRequest
+from .models import Item, User, BookingRequest, Message
 from .serializers import ItemSerializer, UserSerializer, RegisterSerializer, BookingSerializer
 
 
-# ---------------- REGISTER ----------------
-
+# ---------------- AUTH ----------------
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register_user(request):
-
     serializer = RegisterSerializer(data=request.data)
 
     if serializer.is_valid():
@@ -33,18 +26,15 @@ def register_user(request):
     return Response(serializer.errors, status=400)
 
 
-# ---------------- LOGIN ----------------
-
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login_user(request):
-
     username = request.data.get("username")
     password = request.data.get("password")
 
     user = authenticate(request, username=username, password=password)
 
-    if user is not None:
+    if user:
         refresh = RefreshToken.for_user(user)
 
         return Response({
@@ -56,55 +46,27 @@ def login_user(request):
     return Response({"error": "Invalid credentials"}, status=401)
 
 
-# ---------------- GET USER ----------------
-
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def get_user(request, id):
-
-    try:
-        user = User.objects.get(id=id)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-    except User.DoesNotExist:
-        return Response({"error": "User not found"}, status=404)
-
-
-# ---------------- GET ALL ITEMS ----------------
-
+# ---------------- ITEMS ----------------
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_items(request):
-
     items = Item.objects.all().order_by("-created_at")
-    serializer = ItemSerializer(items, many=True)
+    return Response(ItemSerializer(items, many=True).data)
 
-    return Response(serializer.data)
-
-
-# ---------------- GET SINGLE ITEM ----------------
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_item(request, id):
-
     try:
         item = Item.objects.get(id=id)
-        serializer = ItemSerializer(item)
-
-        return Response(serializer.data)
-
+        return Response(ItemSerializer(item).data)
     except Item.DoesNotExist:
         return Response({"error": "Item not found"}, status=404)
 
 
-# ---------------- CREATE ITEM ----------------
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_item(request):
-
     serializer = ItemSerializer(data=request.data)
 
     if serializer.is_valid():
@@ -114,256 +76,191 @@ def create_item(request):
     return Response(serializer.errors, status=400)
 
 
-# ---------------- MY ITEMS ----------------
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def my_items(request):
-
     items = Item.objects.filter(owner=request.user)
-    serializer = ItemSerializer(items, many=True)
-
-    return Response(serializer.data)
+    return Response(ItemSerializer(items, many=True).data)
 
 
-# ---------------- REQUEST BOOKING ----------------
-
+# ---------------- BOOKINGS ----------------
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def request_booking(request, item_id):
 
-    try:
-        item = Item.objects.get(id=item_id)
+    item = Item.objects.get(id=item_id)
 
-        if not item.is_available:
-            return Response({"error": "Item not available"}, status=400)
+    if not item.is_available:
+        return Response({"error": "Item not available"}, status=400)
 
-        start_date = request.data.get("start_date")
-        end_date = request.data.get("end_date")
+    booking = BookingRequest.objects.create(
+        item=item,
+        requester=request.user,
+        start_date=request.data.get("start_date"),
+        end_date=request.data.get("end_date")
+    )
 
-        booking = BookingRequest.objects.create(
-            item=item,
-            requester=request.user,
-            start_date=start_date,
-            end_date=end_date
-        )
+    return Response({"booking_id": booking.id})
 
-        return Response({
-            "message": "Booking request sent",
-            "booking_id": booking.id
-        })
-
-    except Item.DoesNotExist:
-        return Response({"error": "Item not found"}, status=404)
-
-
-# ---------------- MY BOOKINGS ----------------
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def my_bookings(request):
-
     bookings = BookingRequest.objects.filter(requester=request.user)
-    serializer = BookingSerializer(bookings, many=True)
+    return Response(BookingSerializer(bookings, many=True).data)
 
-    return Response(serializer.data)
-
-
-# ---------------- INCOMING REQUESTS ----------------
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def incoming_requests(request):
-
     bookings = BookingRequest.objects.filter(item__owner=request.user)
-    serializer = BookingSerializer(bookings, many=True)
-
-    return Response(serializer.data)
+    return Response(BookingSerializer(bookings, many=True).data)
 
 
-# ---------------- APPROVE / REJECT BOOKING ----------------
-
+# ---------------- APPROVE / REJECT ----------------
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def respond_booking(request, booking_id):
 
-    try:
+    booking = BookingRequest.objects.get(id=booking_id)
 
-        booking = BookingRequest.objects.get(id=booking_id)
+    if booking.item.owner != request.user:
+        return Response({"error": "Not allowed"}, status=403)
 
-        if booking.item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
+    action = request.data.get("action")
 
-        action = request.data.get("action")
-
-        if action == "approve":
-
-            booking.status = "approved"
-
-            # Generate QR
-            qr_data = f"BOOKING_{booking.id}"
-            qr = qrcode.make(qr_data)
-
-            qr_folder = os.path.join(settings.MEDIA_ROOT, "qr_codes")
-            os.makedirs(qr_folder, exist_ok=True)
-
-            qr_path = os.path.join(qr_folder, f"booking_{booking.id}.png")
-            qr.save(qr_path)
-
-            booking.pickup_qr = f"/media/qr_codes/booking_{booking.id}.png"
-
-            booking.save()
-
-            return Response({
-                "message": "Booking approved and QR generated",
-                "pickup_qr": booking.pickup_qr
-            })
-
-        elif action == "reject":
-
-            booking.status = "rejected"
-            booking.save()
-
-            return Response({"message": "Booking rejected"})
-
-        return Response({"error": "Invalid action"}, status=400)
-
-    except BookingRequest.DoesNotExist:
-        return Response({"error": "Booking not found"}, status=404)
-
-
-# ---------------- PICKUP VIA QR ----------------
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def pickup_item(request, booking_id):
-
-    try:
-
-        booking = BookingRequest.objects.get(id=booking_id)
-
-        if booking.status != "approved":
-            return Response({"error": "Booking not approved"}, status=400)
-
+    if action == "approve":
         booking.status = "rented"
         booking.item.is_available = False
 
         booking.item.save()
         booking.save()
 
-        return Response({"message": "Item pickup verified. Rental started."})
+        return Response({"message": "Approved → Rented"})
 
-    except BookingRequest.DoesNotExist:
-        return Response({"error": "Booking not found"}, status=404)
-
-
-# ---------------- RETURN IMAGE ----------------
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def upload_return_image(request, booking_id):
-
-    try:
-
-        booking = BookingRequest.objects.get(id=booking_id)
-
-        image = request.FILES.get("return_image")
-
-        if not image:
-            return Response({"error": "Image required"}, status=400)
-
-        booking.return_image = image
+    elif action == "reject":
+        booking.status = "rejected"
         booking.save()
 
-        return Response({"message": "Return image uploaded"})
+        return Response({"message": "Rejected"})
+
+    return Response({"error": "Invalid action"}, status=400)
+
+
+# ---------------- RETURN FLOW ----------------
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_returned(request, booking_id):
+
+    try:
+        booking = BookingRequest.objects.get(id=booking_id)
+
+        if booking.requester != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+
+        if booking.status != "rented":
+            return Response({"error": "Invalid state"}, status=400)
+
+        booking.status = "return_pending"
+        booking.save()
+
+        return Response({"message": "Marked as returned"})
 
     except BookingRequest.DoesNotExist:
         return Response({"error": "Booking not found"}, status=404)
 
-
-# ---------------- COMPLETE BOOKING ----------------
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def complete_booking(request, booking_id):
 
-    try:
+    booking = BookingRequest.objects.get(id=booking_id)
 
-        booking = BookingRequest.objects.get(id=booking_id)
+    if booking.item.owner != request.user:
+        return Response({"error": "Not allowed"}, status=403)
 
-        if booking.item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
+    booking.status = "completed"
+    booking.item.is_available = True
 
-        booking.status = "completed"
-        booking.item.is_available = True
+    booking.item.save()
+    booking.save()
 
-        booking.item.save()
-        booking.save()
+    return Response({"message": "Item available again"})
 
-        return Response({"message": "Booking completed and item available again"})
 
-    except BookingRequest.DoesNotExist:
-        return Response({"error": "Booking not found"}, status=404)
-# ---------------- UPDATE ITEM ----------------
-
-@api_view(["PUT", "PATCH"])
+# ---------------- CHAT ----------------
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def update_item(request, pk):
+def get_messages(request, booking_id):
 
-    try:
-        item = Item.objects.get(pk=pk)
+    booking = BookingRequest.objects.get(id=booking_id)
 
-        if item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
+    messages = Message.objects.filter(
+        booking=booking
+    ).order_by("created_at")
 
-        serializer = ItemSerializer(item, data=request.data, partial=True)
+    data = [
+        {
+            "id": m.id,
+            "text": m.text,
+            "sender_id": m.sender.id,
+            "sender": m.sender.username,
+            "is_me": m.sender.id == request.user.id
+        }
+        for m in messages
+    ]
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-
-        return Response(serializer.errors, status=400)
-
-    except Item.DoesNotExist:
-        return Response({"error": "Item not found"}, status=404)
+    return Response(data)
 
 
-# ---------------- DELETE ITEM ----------------
-
-@api_view(["DELETE"])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def delete_item(request, pk):
+def send_message(request, booking_id):
 
-    try:
-        item = Item.objects.get(pk=pk)
+    booking = BookingRequest.objects.get(id=booking_id)
 
-        if item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
+    text = request.data.get("text")
 
-        item.delete()
+    if not text:
+        return Response({"error": "Empty message"}, status=400)
 
-        return Response({"message": "Item deleted"}, status=200)
+    Message.objects.create(
+        booking=booking,
+        sender=request.user,
+        text=text
+    )
 
-    except Item.DoesNotExist:
-        return Response({"error": "Item not found"}, status=404)
-
-
-# ---------------- MARK ITEM AVAILABLE AGAIN ----------------
-
-@api_view(["POST"])
+    return Response({"message": "sent"})
+# ---------------- PROFILE ----------------
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def mark_item_available(request, item_id):
+def get_profile(request):
 
-    try:
-        item = Item.objects.get(id=item_id)
+    user = request.user
 
-        if item.owner != request.user:
-            return Response({"error": "Not allowed"}, status=403)
+    total_items = Item.objects.filter(owner=user).count()
 
-        item.is_available = True
-        item.save()
+    return Response({
+        "username": user.username,
+        "email": user.email,
+        "phone": user.phone,
+        "branch": user.branch,
+        "year": user.year,
+        "total_items": total_items,
+    })
 
-        return Response({"message": "Item marked available again"})
 
-    except Item.DoesNotExist:
-        return Response({"error": "Item not found"}, status=404)
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+
+    user = request.user
+
+    user.email = request.data.get("email", user.email)
+    user.phone = request.data.get("phone", user.phone)
+    user.branch = request.data.get("branch", user.branch)
+    user.year = request.data.get("year", user.year)
+
+    user.save()
+
+    return Response({"message": "Profile updated"})
