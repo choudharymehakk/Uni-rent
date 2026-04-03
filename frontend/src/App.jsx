@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Landing from "./pages/Landing";
-import Login from "./pages/Login";
+import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ItemDetail from "./pages/ItemDetail";
