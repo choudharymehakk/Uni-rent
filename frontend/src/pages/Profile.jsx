@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 function Profile() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -24,7 +27,7 @@ function Profile() {
                 } else {
                     if (res.status === 401) {
                         localStorage.removeItem("token");
-                        window.location.href = "/login";
+                        navigate("/login");
                     }
                 }
 
@@ -36,51 +39,83 @@ function Profile() {
         };
 
         fetchProfile();
-    }, []);
+    }, [navigate]);
 
     return (
         <>
             <Navbar />
 
             <div className="page">
+                <h1>My Profile</h1>
+
                 {loading ? (
                     <p style={{ color: "var(--muted)" }}>Loading profile...</p>
                 ) : user && (
-                    <>
-                        {/* PROFILE CARD */}
-                        <div className="profile-card-modern">
-                            <div className="profile-left">
-                                <div className="avatar">
-                                    {user.username.charAt(0).toUpperCase()}
-                                </div>
+                    <div className="profile-card">
 
-                                <div>
-                                    <h2>{user.username}</h2>
-                                    <p style={{ color: "var(--muted)" }}>{user.email}</p>
-                                    <p style={{ color: "var(--muted)" }}>
-                                        {user.branch} • Year {user.year}
-                                    </p>
-                                </div>
-                            </div>
+                        <h2>{user.username}</h2>
 
-                            <div className="profile-actions">
-                                <button className="btn primary">Edit Profile</button>
-                            </div>
-                        </div>
+                        <p><strong>Email:</strong> {user.email}</p>
+                        <p><strong>Branch:</strong> {user.branch}</p>
+                        <p><strong>Year:</strong> {user.year}</p>
+
+                        <hr style={{ margin: "15px 0", borderColor: "#1f2937" }} />
 
                         {/* STATS */}
-                        <div className="stats-grid">
-                            <div className="stat-box">
-                                <h3>{user.total_items}</h3>
-                                <p>My Items</p>
+                        <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+                            <div>
+                                <strong style={{ color: "#22c55e" }}>
+                                    {user.total_items}
+                                </strong>
+                                <p style={{ color: "var(--muted)", fontSize: "14px" }}>
+                                    My Items
+                                </p>
                             </div>
 
-                            <div className="stat-box">
-                                <h3>{user.incoming_requests}</h3>
-                                <p>Requests</p>
+                            <div>
+                                <strong style={{ color: "#22c55e" }}>
+                                    {user.incoming_requests}
+                                </strong>
+                                <p style={{ color: "var(--muted)", fontSize: "14px" }}>
+                                    Requests
+                                </p>
+                            </div>
+
+                            <div>
+                                <strong style={{ color: "#22c55e" }}>
+                                    {user.total_bookings || 0}
+                                </strong>
+                                <p style={{ color: "var(--muted)", fontSize: "14px" }}>
+                                    Bookings
+                                </p>
                             </div>
                         </div>
-                    </>
+
+                        {/* ACTION BUTTONS */}
+                        <div style={{ display: "flex", gap: "10px" }}>
+                            <button
+                                className="btn primary"
+                                onClick={() => navigate("/edit-profile")}
+                            >
+                                Edit Profile
+                            </button>
+
+                            <button
+                                className="btn secondary"
+                                onClick={() => navigate("/my-items")}
+                            >
+                                My Items
+                            </button>
+
+                            <button
+                                className="btn secondary"
+                                onClick={() => navigate("/add-item")}
+                            >
+                                + List Item
+                            </button>
+                        </div>
+
+                    </div>
                 )}
             </div>
         </>

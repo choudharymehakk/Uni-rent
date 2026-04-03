@@ -248,6 +248,10 @@ def get_profile(request):
         item__owner=user
     ).count()
 
+    total_bookings = BookingRequest.objects.filter(
+        requester=user
+    ).count()
+
     return Response({
         "username": user.username,
         "email": user.email,
@@ -255,9 +259,9 @@ def get_profile(request):
         "branch": user.branch,
         "year": user.year,
         "total_items": total_items,
-        "incoming_requests": incoming_requests
+        "incoming_requests": incoming_requests,
+        "total_bookings": total_bookings
     })
-
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
