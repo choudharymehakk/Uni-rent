@@ -43,27 +43,44 @@ function Profile() {
             <Navbar />
 
             <div className="page">
-                <h1>My Profile</h1>
-
                 {loading ? (
                     <p style={{ color: "var(--muted)" }}>Loading profile...</p>
-                ) : user ? (
-                    <div className="profile-card">
+                ) : user && (
+                    <>
+                        {/* PROFILE CARD */}
+                        <div className="profile-card-modern">
+                            <div className="profile-left">
+                                <div className="avatar">
+                                    {user.username.charAt(0).toUpperCase()}
+                                </div>
 
-                        <h2>{user.username}</h2>
+                                <div>
+                                    <h2>{user.username}</h2>
+                                    <p style={{ color: "var(--muted)" }}>{user.email}</p>
+                                    <p style={{ color: "var(--muted)" }}>
+                                        {user.branch} • Year {user.year}
+                                    </p>
+                                </div>
+                            </div>
 
-                        <p><strong>Email:</strong> {user.email}</p>
-                        <p><strong>Branch:</strong> {user.branch}</p>
-                        <p><strong>Year:</strong> {user.year}</p>
+                            <div className="profile-actions">
+                                <button className="btn primary">Edit Profile</button>
+                            </div>
+                        </div>
 
-                        <hr />
+                        {/* STATS */}
+                        <div className="stats-grid">
+                            <div className="stat-box">
+                                <h3>{user.total_items}</h3>
+                                <p>My Items</p>
+                            </div>
 
-                        <p><strong>My Items:</strong> {user.total_items}</p>
-                        <p><strong>Incoming Requests:</strong> {user.incoming_requests}</p>
-
-                    </div>
-                ) : (
-                    <p>Unable to load profile</p>
+                            <div className="stat-box">
+                                <h3>{user.incoming_requests}</h3>
+                                <p>Requests</p>
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
         </>

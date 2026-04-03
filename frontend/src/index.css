@@ -967,3 +967,58 @@ textarea:focus {
   animation: floatText 4s ease-in-out infinite;
   animation-delay: 0.5s;
 }
+
+/* PROFILE MODERN CARD */
+.profile-card-modern {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  background: #22c55e;
+  color: black;
+  font-weight: bold;
+  font-size: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.stat-box {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-box h3 {
+  font-size: 28px;
+  color: #22c55e;
+}
+
+.stat-box p {
+  color: #9ca3af;
+}
