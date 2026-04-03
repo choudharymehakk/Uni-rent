@@ -56,7 +56,7 @@ function AddItem() {
     try {
 
       const res = await fetch(
-        "http://127.0.0.1:8000/api/items/create/",
+        "https://uni-rent-backend.onrender.com/api/items/create/",
         {
           method: "POST",
           headers: {

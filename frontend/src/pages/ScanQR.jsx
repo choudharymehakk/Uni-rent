@@ -28,7 +28,7 @@ function ScanQR() {
                     const bookingId = decodedText.replace("BOOKING_", "");
 
                     const res = await fetch(
-                        `http://127.0.0.1:8000/api/bookings/${bookingId}/pickup/`,
+                        `https://uni-rent-backend.onrender.com/api/bookings/${bookingId}/pickup/`,
                         {
                             method: "POST",
                             headers: {

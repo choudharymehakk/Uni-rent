@@ -19,7 +19,7 @@ function Profile() {
     });
 
     const fetchProfile = () => {
-        fetch("http://127.0.0.1:8000/api/profile/", {
+        fetch("https://uni-rent-backend.onrender.com/api/profile/", {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(res => res.json())
@@ -37,7 +37,7 @@ function Profile() {
     const updateProfile = async () => {
         try {
             const res = await fetch(
-                "http://127.0.0.1:8000/api/profile/update/",
+                "https://uni-rent-backend.onrender.com/api/profile/update/",
                 {
                     method: "PUT",
                     headers: {

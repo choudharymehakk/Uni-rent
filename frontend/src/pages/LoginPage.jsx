@@ -14,25 +14,47 @@ function Login() {
       setError("Please fill in all fields");
       return;
     }
+
     setLoading(true);
     setError("");
 
-    const res = await fetch("http://127.0.0.1:8000/api/login/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const res = await fetch(
+        "https://uni-rent-backend.onrender.com/api/login/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
+        }
+      );
 
-    const data = await res.json();
-    setLoading(false);
+      const data = await res.json();
+      setLoading(false);
 
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("username", data.username);
-      navigate("/dashboard");
-    } else {
-      setError(data.error || "Invalid credentials");
+      if (res.ok) {
+        // ✅ Store JWT token
+        localStorage.setItem("token", data.access);
+
+        // Optional (if backend sends these)
+        if (data.user_id) {
+          localStorage.setItem("user_id", data.user_id);
+        }
+        if (data.username) {
+          localStorage.setItem("username", data.username);
+        }
+
+        navigate("/dashboard");
+      } else {
+        setError(data.detail || "Invalid credentials");
+      }
+    } catch (err) {
+      setLoading(false);
+      setError("Server error. Please try again.");
     }
   };
 
@@ -61,9 +83,23 @@ function Login() {
             />
           </div>
 
-          {error && <p style={{ color: "var(--danger)", fontSize: "14px", marginBottom: "12px" }}>{error}</p>}
+          {error && (
+            <p
+              style={{
+                color: "var(--danger)",
+                fontSize: "14px",
+                marginBottom: "12px",
+              }}
+            >
+              {error}
+            </p>
+          )}
 
-          <button className="btn primary" onClick={handleLogin} disabled={loading}>
+          <button
+            className="btn primary"
+            onClick={handleLogin}
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
 

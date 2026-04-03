@@ -10,7 +10,7 @@ function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/items/")
+    fetch("https://uni-rent-backend.onrender.com/api/items/")
       .then(res => res.json())
       .then(data => {
         setItems(data);
@@ -62,7 +62,7 @@ function Dashboard() {
               >
 
                 <img
-                  src={`http://127.0.0.1:8000${item.image}`}
+                  src={`https://uni-rent-backend.onrender.com${item.image}`}
                   alt={item.title}
                 />
 

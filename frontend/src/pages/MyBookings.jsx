@@ -12,7 +12,7 @@ function MyBookings() {
   const userId = parseInt(localStorage.getItem("user_id"));
 
   const fetchBookings = () => {
-    fetch("http://127.0.0.1:8000/api/bookings/mine/", {
+    fetch("https://uni-rent-backend.onrender.com/api/bookings/mine/", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -31,7 +31,7 @@ function MyBookings() {
   const fetchMessages = async (bookingId) => {
     try {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/bookings/${bookingId}/messages/`,
+        `https://uni-rent-backend.onrender.com/api/bookings/${bookingId}/messages/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -49,7 +49,7 @@ function MyBookings() {
     if (!text) return;
 
     await fetch(
-      `http://127.0.0.1:8000/api/bookings/${bookingId}/send-message/`,
+      `https://uni-rent-backend.onrender.comapi/bookings/${bookingId}/send-message/`,
       {
         method: "POST",
         headers: {
@@ -108,7 +108,7 @@ function MyBookings() {
                   className="btn primary"
                   onClick={async () => {
                     await fetch(
-                      `http://127.0.0.1:8000/api/bookings/${b.id}/mark-returned/`,
+                      `https://uni-rent-backend.onrender.com/api/bookings/${b.id}/mark-returned/`,
                       {
                         method: "POST",
                         headers: {

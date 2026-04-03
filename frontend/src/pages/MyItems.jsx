@@ -11,7 +11,7 @@ function MyItems() {
   const fetchItems = async () => {
     try {
       const res = await fetch(
-        "http://127.0.0.1:8000/api/items/mine/",
+        "https://uni-rent-backend.onrender.com/api/items/mine/",
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -52,7 +52,7 @@ function MyItems() {
               <div key={item.id} className="item-card">
 
                 <img
-                  src={`http://127.0.0.1:8000${item.image}`}
+                  src={`https://uni-rent-backend.onrender.com${item.image}`}
                   alt={item.title}
                 />
 

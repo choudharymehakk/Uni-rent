@@ -14,7 +14,7 @@ function ItemDetail() {
   const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/items/${id}/`)
+    fetch(`https://uni-rent-backend.onrender.com/api/items/${id}/`)
       .then(res => res.json())
       .then(data => setItem(data));
   }, [id]);
@@ -27,7 +27,7 @@ function ItemDetail() {
     setLoading(true);
     setMessage("");
 
-    const res = await fetch(`http://127.0.0.1:8000/api/items/${id}/book/`, {
+    const res = await fetch(`https://uni-rent-backend.onrender.com/api/items/${id}/book/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +59,7 @@ function ItemDetail() {
         </button>
 
         <div className="item-detail-grid">
-          <img src={`http://127.0.0.1:8000${item.image}`} alt={item.title} />
+          <img src={`https://uni-rent-backend.onrender.com${item.image}`} alt={item.title} />
 
           <div className="item-detail-info">
             <h1>{item.title}</h1>
