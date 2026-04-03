@@ -29,8 +29,8 @@ function App() {
 
         {/* Public Pages */}
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
 
         {/* Protected Pages */}
         <Route
