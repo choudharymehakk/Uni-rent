@@ -43,7 +43,7 @@ function Navbar() {
 
             <Link to="/my-bookings">My Bookings</Link>
 
-            <Link to="/scan">Scan QR</Link>
+
 
             <Link to="/add-item" className="btn primary">
               + List Item

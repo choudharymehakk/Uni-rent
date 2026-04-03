@@ -21,6 +21,7 @@ function Login() {
     try {
       const res = await fetch(
         "https://uni-rent-backend.onrender.com/api/login/",
+
         {
           method: "POST",
           headers: {
@@ -39,6 +40,7 @@ function Login() {
       if (res.ok) {
         // ✅ Store JWT token
         localStorage.setItem("token", data.access);
+        console.log("LOGIN RESPONSE:", data);
 
         // Optional (if backend sends these)
         if (data.user_id) {
