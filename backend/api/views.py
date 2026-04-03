@@ -19,7 +19,8 @@ def register_user(request):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            "token": str(refresh.access_token),
+            "access": str(refresh.access_token),   # ✅ FIXED
+            "refresh": str(refresh),
             "username": user.username
         }, status=201)
 
@@ -38,7 +39,8 @@ def login_user(request):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            "token": str(refresh.access_token),
+            "access": str(refresh.access_token),   # ✅ FIXED
+            "refresh": str(refresh),
             "username": user.username,
             "user_id": user.id
         })
@@ -231,6 +233,8 @@ def send_message(request, booking_id):
     )
 
     return Response({"message": "sent"})
+
+
 # ---------------- PROFILE ----------------
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
