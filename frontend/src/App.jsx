@@ -11,6 +11,9 @@ import MyBookings from "./pages/MyBookings.jsx";
 import Requests from "./pages/Requests.jsx";
 import ScanQR from "./pages/ScanQR.jsx";
 import Profile from "./pages/Profile.jsx";
+import EditProfile from "./pages/EditProfile";
+
+
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -88,6 +91,7 @@ function App() {
         />
 
         <Route path="/profile" element={<Profile />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
         <Route
           path="/requests"
           element={

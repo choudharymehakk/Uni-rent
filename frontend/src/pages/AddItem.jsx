@@ -58,44 +58,56 @@ function AddItem() {
     <>
       <Navbar />
 
-      <div className="page">
-        <h1>Add New Item</h1>
+      <div className="page" style={{ maxWidth: "900px", margin: "0 auto" }}>
+        <h1 style={{ marginBottom: "25px" }}>Add New Item</h1>
 
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Item Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <input
-            type="number"
-            placeholder="Price per day"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-
-          <input
-            type="number"
-            placeholder="Deposit amount"
-            value={deposit}
-            onChange={(e) => setDeposit(e.target.value)}
-          />
-
-          <input
-            type="file"
-            onChange={(e) => setImage(e.target.files[0])}
-          />
-        </div>
-
-        <button
-          className="btn primary"
-          onClick={handleSubmit}
-          disabled={loading}
+        <div
+          style={{
+            background: "#0f172a",
+            padding: "25px",
+            borderRadius: "12px",
+            border: "1px solid #1f2937",
+          }}
         >
-          {loading ? "Adding..." : "Add Item"}
-        </button>
+          <div className="form-group">
+
+            <input
+              type="text"
+              placeholder="Item Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
+            <input
+              type="number"
+              placeholder="Price per day"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+
+            <input
+              type="number"
+              placeholder="Deposit amount"
+              value={deposit}
+              onChange={(e) => setDeposit(e.target.value)}
+            />
+
+            <input
+              type="file"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+          </div>
+
+          <div style={{ marginTop: "20px" }}>
+            <button
+              className="btn primary"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Adding..." : "Add Item"}
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );

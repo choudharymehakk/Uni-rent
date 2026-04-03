@@ -45,77 +45,82 @@ function Profile() {
         <>
             <Navbar />
 
-            <div className="page">
-                <h1>My Profile</h1>
+            <div className="page" style={{ maxWidth: "1100px", margin: "0 auto" }}>
+                <h1 style={{ marginBottom: "25px" }}>My Profile</h1>
 
                 {loading ? (
                     <p style={{ color: "var(--muted)" }}>Loading profile...</p>
                 ) : user && (
-                    <div className="profile-card">
-
-                        <h2>{user.username}</h2>
-
-                        <p><strong>Email:</strong> {user.email}</p>
-                        <p><strong>Branch:</strong> {user.branch}</p>
-                        <p><strong>Year:</strong> {user.year}</p>
-
-                        <hr style={{ margin: "15px 0", borderColor: "#1f2937" }} />
-
-                        {/* STATS */}
-                        <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+                    <>
+                        {/* TOP SECTION */}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                marginBottom: "30px",
+                            }}
+                        >
                             <div>
-                                <strong style={{ color: "#22c55e" }}>
-                                    {user.total_items}
-                                </strong>
-                                <p style={{ color: "var(--muted)", fontSize: "14px" }}>
-                                    My Items
+                                <h2 style={{ marginBottom: "5px" }}>{user.username}</h2>
+                                <p style={{ color: "var(--muted)" }}>{user.email}</p>
+                                <p style={{ color: "var(--muted)" }}>
+                                    {user.branch} • Year {user.year}
                                 </p>
                             </div>
 
-                            <div>
-                                <strong style={{ color: "#22c55e" }}>
-                                    {user.incoming_requests}
-                                </strong>
-                                <p style={{ color: "var(--muted)", fontSize: "14px" }}>
-                                    Requests
-                                </p>
-                            </div>
-
-                            <div>
-                                <strong style={{ color: "#22c55e" }}>
-                                    {user.total_bookings || 0}
-                                </strong>
-                                <p style={{ color: "var(--muted)", fontSize: "14px" }}>
-                                    Bookings
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* ACTION BUTTONS */}
-                        <div style={{ display: "flex", gap: "10px" }}>
                             <button
-                                className="btn primary"
+                                className="btn secondary"
                                 onClick={() => navigate("/edit-profile")}
                             >
                                 Edit Profile
                             </button>
+                        </div>
 
+                        <hr style={{ borderColor: "#1f2937", marginBottom: "30px" }} />
+
+                        {/* STATS SECTION */}
+                        <div
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(3, 1fr)",
+                                gap: "20px",
+                                marginBottom: "35px",
+                            }}
+                        >
+                            <div className="stat-card">
+                                <h2>{user.total_items}</h2>
+                                <p>My Items</p>
+                            </div>
+
+                            <div className="stat-card">
+                                <h2>{user.incoming_requests}</h2>
+                                <p>Requests</p>
+                            </div>
+
+                            <div className="stat-card">
+                                <h2>{user.total_bookings || 0}</h2>
+                                <p>Bookings</p>
+                            </div>
+                        </div>
+
+                        {/* ACTION SECTION */}
+                        <div style={{ display: "flex", gap: "15px" }}>
                             <button
-                                className="btn secondary"
+                                className="btn primary"
                                 onClick={() => navigate("/my-items")}
                             >
                                 My Items
                             </button>
 
                             <button
-                                className="btn secondary"
+                                className="btn primary"
                                 onClick={() => navigate("/add-item")}
                             >
-                                + List Item
+                                + List New Item
                             </button>
                         </div>
-
-                    </div>
+                    </>
                 )}
             </div>
         </>

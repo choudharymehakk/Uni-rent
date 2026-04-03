@@ -1022,3 +1022,21 @@ textarea:focus {
 .stat-box p {
   color: #9ca3af;
 }
+
+.stat-card {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-card h2 {
+  color: #22c55e;
+  margin-bottom: 5px;
+}
+
+.stat-card p {
+  color: #9ca3af;
+  font-size: 14px;
+}
