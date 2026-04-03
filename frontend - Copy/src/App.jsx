@@ -1,14 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/LoginPage.jsx";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import ItemDetail from "./pages/ItemDetail";
-import AddItem from "./pages/AddItem";
-import MyItems from "./pages/MyItems";
-import MyBookings from "./pages/MyBookings";
-import IncomingRequests from "./pages/IncomingRequests";
 
+import Landing from "./pages/Landing.jsx";
+import Login from "./pages/LoginPage.jsx";
+import Signup from "./pages/Signup.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import ItemDetail from "./pages/ItemDetail.jsx";
+import AddItem from "./pages/AddItem.jsx";
+import MyItems from "./pages/MyItems.jsx";
+import MyBookings from "./pages/MyBookings.jsx";
+import Requests from "./pages/Requests.jsx";
+import ScanQR from "./pages/ScanQR.jsx";
+import Profile from "./pages/Profile.jsx";
 function ProtectedRoute({ children }) {
   const isLoggedIn = localStorage.getItem("token");
   return isLoggedIn ? children : <Navigate to="/login" />;
