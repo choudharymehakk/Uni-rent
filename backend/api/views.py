@@ -244,6 +244,10 @@ def get_profile(request):
 
     total_items = Item.objects.filter(owner=user).count()
 
+    incoming_requests = BookingRequest.objects.filter(
+        item__owner=user
+    ).count()
+
     return Response({
         "username": user.username,
         "email": user.email,
@@ -251,6 +255,7 @@ def get_profile(request):
         "branch": user.branch,
         "year": user.year,
         "total_items": total_items,
+        "incoming_requests": incoming_requests
     })
 
 

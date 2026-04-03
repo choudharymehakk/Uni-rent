@@ -26,12 +26,11 @@ function Profile() {
                         localStorage.removeItem("token");
                         window.location.href = "/login";
                     }
-                    console.error("API Error:", data);
                 }
 
                 setLoading(false);
             } catch (err) {
-                console.error("Error:", err);
+                console.error(err);
                 setLoading(false);
             }
         };
@@ -50,11 +49,18 @@ function Profile() {
                     <p style={{ color: "var(--muted)" }}>Loading profile...</p>
                 ) : user ? (
                     <div className="profile-card">
+
                         <h2>{user.username}</h2>
 
                         <p><strong>Email:</strong> {user.email}</p>
                         <p><strong>Branch:</strong> {user.branch}</p>
                         <p><strong>Year:</strong> {user.year}</p>
+
+                        <hr />
+
+                        <p><strong>My Items:</strong> {user.total_items}</p>
+                        <p><strong>Incoming Requests:</strong> {user.incoming_requests}</p>
+
                     </div>
                 ) : (
                     <p>Unable to load profile</p>
