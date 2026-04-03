@@ -6,6 +6,6 @@ export default defineConfig({
   preview: {
     host: true,
     port: 10000,
-    allowedHosts: ['https://uni-rent-ws7y.onrender.com/']
+    allowedHosts: true
   }
 })
