@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import create_order, verify_payment
+from .views import mark_cash_payment
 
 urlpatterns = [
 
@@ -32,6 +34,10 @@ urlpatterns = [
     # ✅ PROFILE
     path("profile/", views.get_profile),
     path("profile/update/", views.update_profile),
+    #payment
+    path("create-order/", create_order),
+    path("verify-payment/", verify_payment),
+    path("bookings/<int:booking_id>/cash/", mark_cash_payment),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

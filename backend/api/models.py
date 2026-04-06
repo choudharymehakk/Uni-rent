@@ -89,9 +89,7 @@ class Item(models.Model):
         on_delete=models.CASCADE
     )
 
-    image = models.ImageField(
-        upload_to="items/"
-    )
+    image = models.TextField()
 
     is_available = models.BooleanField(
         default=True
@@ -130,14 +128,12 @@ class BookingRequest(models.Model):
         blank=True
     )
 
-    # QR code generated for pickup verification
     pickup_qr = models.ImageField(
         upload_to="qr_codes/",
         null=True,
         blank=True
     )
 
-    # renter uploads image while returning item
     return_image = models.ImageField(
         upload_to="returns/",
         null=True,
@@ -155,6 +151,16 @@ class BookingRequest(models.Model):
         ],
         default="pending"
     )
+
+    # ✅ FIXED INDENTATION HERE
+    payment_method = models.CharField(
+        max_length=20,
+        choices=[("cash", "Cash"), ("online", "Online")],
+        null=True,
+        blank=True
+    )
+
+    is_paid = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(
         auto_now_add=True

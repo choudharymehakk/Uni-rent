@@ -53,11 +53,7 @@ function MyItems() {
             {items.map((item) => (
               <div key={item.id} className="item-card">
                 <img
-                  src={
-                    item.image
-                      ? `https://uni-rent-backend.onrender.com${item.image}`
-                      : "https://via.placeholder.com/300"
-                  }
+                  src={item.image}
                   alt={item.title}
                 />
 

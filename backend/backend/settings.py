@@ -28,7 +28,7 @@ MIDDLEWARE = [
 
     'django.middleware.security.SecurityMiddleware',
 
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ ADD THIS
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -90,11 +90,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ✅ MEDIA FILES
+
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+MEDIA_ROOT = BASE_DIR / 'media'
+print("MEDIA ROOT:", MEDIA_ROOT)
 # ✅ Custom User
 AUTH_USER_MODEL = 'api.User'
 
@@ -116,3 +115,5 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+RAZORPAY_KEY_ID = "rzp_live_SZou5LgBiy1ewg"
+RAZORPAY_KEY_SECRET = "MhxJRxoa9VHrkkUMNwXcuqB7"

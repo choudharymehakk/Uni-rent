@@ -70,11 +70,7 @@ function Dashboard() {
                 onClick={() => navigate(`/item/${item.id}`)}
               >
                 <img
-                  src={
-                    item.image
-                      ? `https://uni-rent-backend.onrender.com${item.image}`
-                      : "https://via.placeholder.com/300"
-                  }
+                  src={item.image}
                   alt={item.title}
                 />
 
