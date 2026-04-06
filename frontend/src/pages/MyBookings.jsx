@@ -202,7 +202,7 @@ function MyBookings() {
           bookings.map(b => (
             <div key={b.id} className="booking-card">
               <img
-                src={`https://uni-rent-backend.onrender.com${b.item.image}`}
+                src={b.item.image}
                 alt="item"
                 style={{
                   width: "100%",
@@ -223,7 +223,7 @@ function MyBookings() {
               )}
 
               {/* 🔥 PAYMENT BUTTONS ADDED HERE */}
-              {b.status === "rented" && (
+              {b.status === "rented" && !b.is_paid && (
                 <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
 
                   <button
