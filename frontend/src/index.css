@@ -1040,3 +1040,61 @@ textarea:focus {
   color: #9ca3af;
   font-size: 14px;
 }
+
+/* ---------------- RESPONSIVE ---------------- */
+
+/* Tablets */
+@media (max-width: 768px) {
+
+  .page {
+    padding: 15px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .items-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .item-card img {
+    height: 180px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item-card {
+    padding: 10px;
+  }
+
+  .item-card img {
+    height: 150px;
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .booking-card {
+    padding: 10px;
+  }
+
+  .chat-input {
+    width: 100%;
+  }
+}

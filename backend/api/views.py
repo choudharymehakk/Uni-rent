@@ -308,16 +308,12 @@ def create_order(request):
 
     try:
         amount = request.data.get("amount")
-        booking_id = request.data.get("booking_id")
 
         if not amount:
             return Response({"error": "Amount required"}, status=400)
 
-        import razorpay
-        from django.conf import settings
-
         client = razorpay.Client(
-            auth=(settings.rzp_live_SZou5LgBiy1ewg, settings.MhxJRxoa9VHrkkUMNwXcuqB7)
+            auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
         )
 
         order = client.order.create({
