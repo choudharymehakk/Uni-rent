@@ -66,7 +66,7 @@ function MyBookings() {
       const data = await response.json();
 
       const options = {
-        key: "MhxJRxoa9VHrkkUMNwXcuqB7",
+        key: "rzp_live_SZou5LgBiy1ewg",
         amount: data.amount,
         currency: "INR",
         name: "UniRent",
