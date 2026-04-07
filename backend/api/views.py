@@ -395,8 +395,8 @@ def mark_returned(request, booking_id):
     try:
         booking = BookingRequest.objects.get(id=booking_id)
 
-        # Only owner can mark returned
-        if booking.item.owner != request.user:
+        # user can mark returned
+        if request.user not in [booking.item.owner, booking.requester]:
             return Response({"error": "Not allowed"}, status=403)
 
         # Only if rented
