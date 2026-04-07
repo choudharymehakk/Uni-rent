@@ -83,7 +83,9 @@ function MyBookings() {
                 Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
-                ...res,
+                razorpay_payment_id: res.razorpay_payment_id,
+                razorpay_order_id: res.razorpay_order_id,
+                razorpay_signature: res.razorpay_signature,
                 booking_id: booking.id,
               }),
             }

@@ -164,35 +164,37 @@ def respond_booking(request, booking_id):
 
 
 # ---------------- RETURN FLOW ----------------
-@api_view(["POST"])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def mark_returned(request, booking_id):
+def verify_payment(request):
+    data = request.data
+
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
 
     try:
-        booking = BookingRequest.objects.get(id=booking_id)
-
-        # ✅ Only requester can mark return
-        if booking.requester != request.user:
-            return Response({"error": "Not allowed"}, status=403)
-
-        # ✅ TEMP FIX: allow any status (avoid crash)
-        booking.status = "return_pending"
-        booking.save()
-
-        return Response({
-            "message": "Marked as returned",
-            "status": booking.status
+        client.utility.verify_payment_signature({
+            'razorpay_order_id': data.get('razorpay_order_id'),
+            'razorpay_payment_id': data.get('razorpay_payment_id'),
+            'razorpay_signature': data.get('razorpay_signature')
         })
 
-    except BookingRequest.DoesNotExist:
-        return Response({"error": "Booking not found"}, status=404)
+        booking = BookingRequest.objects.get(id=data.get("booking_id"))
+
+        booking.is_paid = True
+        booking.payment_method = "online"
+        booking.status = "rented"   # 🔥 IMPORTANT
+        booking.save()
+
+        return Response({"status": "success"})
 
     except Exception as e:
+        print("VERIFY ERROR:", str(e))
         return Response({
-            "error": "Server error",
-            "details": str(e)
-        }, status=500)
-
+            "status": "failed",
+            "error": str(e)
+        }, status=400)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -350,16 +352,17 @@ def verify_payment(request):
             'razorpay_signature': data.get('razorpay_signature')
         })
 
-        # ✅ Payment success → update booking
         booking = BookingRequest.objects.get(id=data.get("booking_id"))
 
         booking.is_paid = True
         booking.payment_method = "online"
+        booking.status = "rented"   # 🔥 IMPORTANT
         booking.save()
 
         return Response({"status": "success"})
 
     except Exception as e:
+        print("VERIFY ERROR:", str(e))
         return Response({
             "status": "failed",
             "error": str(e)
