@@ -65,16 +65,14 @@ function Requests() {
     fetchMessages(bookingId);
   };
 
-  useEffect(() => {
-    if (requests.length > 0) {
-      requests.forEach(r => fetchMessages(r.id));
-    }
-  }, [requests]);
+
 
   useEffect(() => {
+    if (!requests.length) return;
+
     const interval = setInterval(() => {
-      requests.forEach(r => fetchMessages(r.id));
-    }, 3000);
+      fetchMessages(requests[0].id); // 🔥 only ONE booking
+    }, 5000); // slower = stable
 
     return () => clearInterval(interval);
   }, [requests]);
