@@ -388,3 +388,27 @@ def mark_cash_payment(request, booking_id):
 
     except BookingRequest.DoesNotExist:
         return Response({"error": "Booking not found"}, status=404)
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_returned(request, booking_id):
+
+    try:
+        booking = BookingRequest.objects.get(id=booking_id)
+
+        # only owner can mark returned
+        if booking.item.owner != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+
+        if not booking.is_paid:
+            return Response({"error": "Payment not done"}, status=400)
+
+        booking.status = "returned"
+        booking.item.is_available = True
+
+        booking.item.save()
+        booking.save()
+
+        return Response({"message": "Item returned successfully"})
+
+    except BookingRequest.DoesNotExist:
+        return Response({"error": "Booking not found"}, status=404)
