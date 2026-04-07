@@ -59,7 +59,7 @@ function ItemDetail() {
         </button>
 
         <div className="item-detail-grid">
-          <img src={`https://uni-rent-backend.onrender.com${item.image}`} alt={item.title} />
+          <img src={item.image} alt={item.title} />
 
           <div className="item-detail-info">
             <h1>{item.title}</h1>
