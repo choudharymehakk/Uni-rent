@@ -205,14 +205,13 @@ def complete_booking(request, booking_id):
     if booking.item.owner != request.user:
         return Response({"error": "Not allowed"}, status=403)
 
-    booking.status = "completed"
+    booking.status = "returned"
     booking.item.is_available = True
 
     booking.item.save()
     booking.save()
 
-    return Response({"message": "Item available again"})
-
+    return Response({"message": "Return completed"})
 
 # ---------------- CHAT ----------------
 @api_view(['GET'])
@@ -395,21 +394,19 @@ def mark_returned(request, booking_id):
     try:
         booking = BookingRequest.objects.get(id=booking_id)
 
-        # user can mark returned
-        if request.user not in [booking.item.owner, booking.requester]:
-            return Response({"error": "Not allowed"}, status=403)
+        # ✅ ONLY renter can initiate return
+        if booking.requester != request.user:
+            return Response({"error": "Only renter can request return"}, status=403)
 
-        # Only if rented
+        # ✅ Only if rented
         if booking.status != "rented":
-            return Response({"error": "Item is not rented"}, status=400)
+            return Response({"error": "Item not rented"}, status=400)
 
-        booking.status = "returned"
-        booking.item.is_available = True
-
-        booking.item.save()
+        # IMPORTANT: DO NOT complete here
+        booking.status = "return_pending"
         booking.save()
 
-        return Response({"message": "Item returned successfully"})
+        return Response({"message": "Return requested"})
 
     except BookingRequest.DoesNotExist:
         return Response({"error": "Booking not found"}, status=404)

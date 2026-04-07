@@ -276,37 +276,23 @@ function MyBookings() {
                 <button
                   className="btn primary"
                   onClick={async () => {
-                    try {
-                      const res = await fetch(
-                        `https://uni-rent-backend.onrender.com/api/bookings/${b.id}/mark-returned/`,
-                        {
-                          method: "POST",
-                          headers: {
-                            Authorization: `Bearer ${token}`,
-                          },
-                        }
-                      );
-
-                      const data = await res.json();
-
-                      if (!res.ok) {
-                        alert(data.error || "Failed to mark returned");
-                        return;
+                    await fetch(
+                      `https://uni-rent-backend.onrender.com/api/bookings/${b.id}/mark-returned/`,
+                      {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
                       }
+                    );
 
-                      alert("Item returned ✅");
-                      fetchBookings(); // refresh UI
-
-                    } catch (err) {
-                      console.error(err);
-                      alert("Server error");
-                    }
+                    alert("Return requested ⏳");
+                    fetchBookings();
                   }}
                 >
-                  Mark as Returned
+                  Request Return
                 </button>
               )}
-
               {/* CHAT (unchanged) */}
               <div style={{ marginTop: "15px" }}>
                 <h4>Chat</h4>
@@ -361,7 +347,7 @@ function MyBookings() {
             </div>
           ))
         )}
-      </div>
+      </div >
     </>
   );
 }
