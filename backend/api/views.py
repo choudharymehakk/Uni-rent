@@ -395,12 +395,13 @@ def mark_returned(request, booking_id):
     try:
         booking = BookingRequest.objects.get(id=booking_id)
 
-        # only owner can mark returned
+        # Only owner can mark returned
         if booking.item.owner != request.user:
             return Response({"error": "Not allowed"}, status=403)
 
-        if not booking.is_paid:
-            return Response({"error": "Payment not done"}, status=400)
+        # Only if rented
+        if booking.status != "rented":
+            return Response({"error": "Item is not rented"}, status=400)
 
         booking.status = "returned"
         booking.item.is_available = True
